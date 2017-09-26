@@ -52,7 +52,7 @@ module Devise
 
       def failed_auth(msg)
         DeviseSamlAuthenticatable::Logger.send(msg)
-        fail!(:invalid)
+        fail!(:saml_invalid)
         Devise.saml_failed_callback.new.handle(@response, self) if Devise.saml_failed_callback
       end
 
