@@ -35,11 +35,15 @@ module Devise
             saml_response,
             attribute_map
           )
+
+          logger.info("Saml decorated response: #{decorated_response.inspect}")
+
           if (Devise.saml_use_subject)
             auth_value = saml_response.name_id
           else
             auth_value = decorated_response.attribute_value_by_resource_key(key)
           end
+
           auth_value.try(:downcase!) if Devise.case_insensitive_keys.include?(key)
 
           resource = Devise.saml_resource_locator.call(self, decorated_response, auth_value)
@@ -64,6 +68,8 @@ module Devise
           if Devise.saml_update_user || (resource.new_record? && Devise.saml_create_user)
             resource = Devise.saml_update_resource_hook.call(resource, decorated_response, auth_value)
           end
+          
+          logger.info("Resource after update hook: #{resource.inspect}")
 
           resource
         end

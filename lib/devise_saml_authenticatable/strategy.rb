@@ -33,11 +33,17 @@ module Devise
 
       private
       def parse_saml_response
+        DeviseSamlAuthenticatable::Logger.send("IDP Entity ID: #{get_idp_entity_id(params)}")
+        DeviseSamlAuthenticatable::Logger.send("Saml Config: #{saml_config(get_idp_entity_id(params)).inspect}")
+
         @response = OneLogin::RubySaml::Response.new(
           params[:SAMLResponse],
           settings: saml_config(get_idp_entity_id(params)),
           allowed_clock_drift: Devise.allowed_clock_drift_in_seconds,
         )
+
+        DeviseSamlAuthenticatable::Logger.send("@response: #{@response.inspect}")
+
         unless @response.is_valid?
           failed_auth("Auth errors: #{@response.errors.join(', ')}")
         end
